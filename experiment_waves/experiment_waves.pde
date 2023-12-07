@@ -1,6 +1,8 @@
 import processing.video.*;
+import controlP5.*;
 
-Movie myMovie;
+Capture cam;
+ControlP5 cp5;
 
 int iteration = 0;
 
@@ -11,27 +13,35 @@ float[] base_values;
 
 void setup() {
   size(640, 720);
-  myMovie = new Movie(this, "exp3.mov");
-  myMovie.loop(); // Start the video looping
   base_values = new float[w*h];
-  delay(1000);
+  String[] cameras = Capture.list();
+
+  if (cameras.length == 0) {
+    println("No cameras found");
+    exit();
+  } else {
+    println("Available cameras:");
+    for (int i = 0; i < cameras.length; i++) {
+      println(cameras[i]);
+    }
+    cam = new Capture(this, cameras[1]);
+    cam.start();
+  }
   background(255);
+  
+  cp5 = new ControlP5(this);
+  set_buttons();
 }
 
 void draw() {
-  image(myMovie, 0, 0, w, h);
-  loadPixels();
-  if (iteration == 0){
-    for (int i = 0; i < pixels.length /2; i++) {
-      float r = red(pixels[i]);
-      float g = green(pixels[i]);
-      float b = blue(pixels[i]);
-      base_values[i] = r + g + b;
-    }
-    delay(1000);
+  println(iteration);
+  if (cam.available()) {
+    cam.read();
   }
+  image(cam, 0, 0, w, h);
+  loadPixels();
   
-  for (int i = 0; i < pixels.length/2; i++){
+  for (int i = 0; i < w*h; i++){
       int y = floor(i/w) + h;
       int x = i % w;
       float r = red(pixels[i]);
@@ -41,10 +51,9 @@ void draw() {
       float threshold = 30;
       int new_i = i + w*h;
       if (curr_brightness < base_values[i] - threshold){
-        //set(x, y, color(0));
         pixels[new_i] = color(0);
       }
-      else{
+      else if (!is_commulative){
         pixels[new_i] = color(255);
       }
       
@@ -67,17 +76,6 @@ void draw() {
   iteration += 1;
 }
 
-void movieEvent(Movie m) {
-  m.read();
-  //m.frameRate(0);
-}
-
-void keyPressed() {
-  if (key == ' ') {
-    if (myMovie.isPlaying()) {
-      myMovie.pause();
-    } else {
-      myMovie.play();
-    }
-  }
+void captureEvent(Capture c) {
+  c.read();
 }
