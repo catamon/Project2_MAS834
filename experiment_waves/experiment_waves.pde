@@ -1,8 +1,12 @@
 import processing.video.*;
 import controlP5.*;
+import java.io.*;
+import java.io.BufferedReader;
+import java.util.Calendar;
+import java.text.SimpleDateFormat;
 
 Capture cam;
-ControlP5 cp5;
+
 
 int iteration = 0;
 
@@ -10,6 +14,8 @@ int w = 640;
 int h = 360;
 
 float[] base_values;
+
+String formattedDateTime;
 
 void setup() {
   size(640, 720);
@@ -31,10 +37,20 @@ void setup() {
   
   cp5 = new ControlP5(this);
   set_buttons();
+  
+  Calendar calendar = Calendar.getInstance();
+  
+  // Format the date and time
+  SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+  formattedDateTime = dateFormat.format(calendar.getTime());
+  
+  create_time_folder();
+    
+  delay(400);
+  
 }
 
 void draw() {
-  println(iteration);
   if (cam.available()) {
     cam.read();
   }
@@ -73,9 +89,24 @@ void draw() {
   //    }
   }
   updatePixels();
-  iteration += 1;
+  if (is_recording){
+    iteration += 1;
+    PImage screenshot = get(0, h, w, h);
+    screenshot.save(path_prefix + "frames/" + formattedDateTime + "/" + String.valueOf(iteration) + ".png");
+  }
+  
 }
 
 void captureEvent(Capture c) {
   c.read();
 }
+
+
+
+
+
+
+// sh file para crear los folders
+// sh file para save video
+// add functionality para start/pause video recording
+// make stop save video by default
