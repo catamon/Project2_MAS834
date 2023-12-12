@@ -1,5 +1,5 @@
 String path_prefix = sketchPath("../Users/catamon/Documents/MAS.834/experiment_waves/");
-String python_path = "../Library/Frameworks/Python.framework/Versions/3.11/bin/python3";
+String python_path = "/Library/Frameworks/Python.framework/Versions/3.11/bin/python3";
 String ffmpeg_path = "/opt/homebrew/bin/ffmpeg";
 
 void run_command(String[] cmd){
@@ -32,7 +32,6 @@ void run_command(String[] cmd){
     } else {
         System.err.println("Python script encountered an error. Exit code: " + exitCode);
         println(reader);
-        println("alo");
     }
 } catch (IOException | InterruptedException e) {
     // Handle the exception, e.g., print an error message or take appropriate action.
@@ -51,4 +50,9 @@ void save_video(){
      String[] cmd = {"/bin/bash", path_prefix + "save_video.sh", formattedDateTime, path_prefix, ffmpeg_path};
      run_command(cmd);
 
+}
+
+void generate_sound(){
+  String[] cmd = {"/bin/bash", path_prefix + "generate_sound.sh", formattedDateTime, path_prefix, String.valueOf(sound_frame_iteration), python_path};
+  run_command(cmd);
 }
